@@ -84,12 +84,6 @@ public final class QueryUtils {
         return output.toString();
     }
 
-
-    /**
-     * Create a private constructor because no one should ever create a {@link QueryUtils} object.
-     * This class is only meant to hold static variables and methods, which can be accessed
-     * directly from the class name QueryUtils (and an object instance of QueryUtils is not needed).
-     */
     private QueryUtils() {
     }
     public static List<News> extractFeatureFromJson(String newsJSON) {
@@ -98,12 +92,8 @@ public final class QueryUtils {
             return null;
         }
 
-        // Create an empty ArrayList that we can start adding earthquakes to
         List<News> news = new ArrayList<>();
 
-        // Try to parse the SAMPLE_JSON_RESPONSE. If there's a problem with the way the JSON
-        // is formatted, a JSONException exception object will be thrown.
-        // Catch the exception so the app doesn't crash, and print the error message     to the logs.
         try {
 
             // TODO: Parse the response given by the SAMPLE_JSON_RESPONSE string and
@@ -124,7 +114,21 @@ public final class QueryUtils {
 
                 String url = currentNews.getString("webUrl");
 
-                News news1 = new News(sectionName, newsDesc, time, url);
+                JSONArray tagsArray = currentNews.getJSONArray("tags");
+
+                String author = "";
+
+                for(int k = 0; k< tagsArray.length(); k++){
+                    JSONObject currentTag = tagsArray.getJSONObject(k);
+
+                    String firstName = currentTag.getString("firstName");
+                    String lastName = currentTag.getString("lastName");
+                    author += firstName + " ";
+                    author += lastName;
+
+                }
+
+                News news1 = new News(sectionName, newsDesc, time, url, author);
                 news.add(news1);
             }
 

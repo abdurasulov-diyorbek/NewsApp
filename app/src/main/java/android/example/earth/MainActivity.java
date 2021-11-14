@@ -13,6 +13,10 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
@@ -24,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private NewsAdapter mAdapter;
     private static final int NEWS_LOADER_ID = 1;
 
-    private static final String NEWS_REQUEST_URL = "https://content.guardianapis.com/search?q=debates&api-key=test";
+    private static final String NEWS_REQUEST_URL = "https://content.guardianapis.com/search?api-key=676faecd-a19a-4b80-bb17-e92fa0b71a17";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,14 +50,28 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             startActivity(websiteIntent);
         });
 
-        LoaderManager loaderManager = getLoaderManager();
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo !=null && networkInfo.isConnected()){
+            LoaderManager loaderManager = getLoaderManager();
 
-        loaderManager.initLoader(NEWS_LOADER_ID, null, this);
+            loaderManager.initLoader(NEWS_LOADER_ID, null, this);
+        } else{
+            View loadingIndicator = findViewById(R.id.progress_bar);
+            loadingIndicator.setVisibility(View.GONE);
+            TextView noInternet = findViewById(R.id.empty_view);
+            noInternet.setText(R.string.no_internet_connection);
+        }
     }
 
     @Override
     public Loader<List<News>> onCreateLoader(int id, Bundle args) {
-        return new NewsLoader(this, NEWS_REQUEST_URL);
+        Uri baseUri = Uri.parse(NEWS_REQUEST_URL);
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+
+        uriBuilder.appendQueryParameter("show-tags", "contributor");
+
+        return new NewsLoader(this, uriBuilder.toString());
     }
 
     @Override
@@ -83,6 +101,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsIntent);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 }

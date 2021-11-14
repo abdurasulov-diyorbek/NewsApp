@@ -35,10 +35,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:maxLines="2"
+            android:maxLines="1"
             android:textColor="@color/textColorEarthquakeLocation"
             android:textSize="16sp"
             tools:text= "World climate is getting hotter every year" />
+
+        <TextView
+            android:id="@+id/author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            tools:text="Baris Jhonson"/>
 
     </LinearLayout>
 
